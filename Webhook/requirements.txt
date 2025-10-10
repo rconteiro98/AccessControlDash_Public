@@ -1,0 +1,9 @@
+Flask
+psycopg2
+python-dateutil
+gunicorn
+tenacity
+yagmail
+python-telegram-bot==21.7
+pillow==11.0.0
+python-Levenshtein==0.26.1
