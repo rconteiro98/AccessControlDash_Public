@@ -1,143 +1,57 @@
 # AccessControlDash
 
-A **multi-container access control platform** that integrates ANPR (Automatic Number Plate Recognition) with a PostgreSQL database, Flask webhook API, and Nginx static server.
+Public-safe infrastructure for an access-control workflow built around an ANPR webhook, PostgreSQL, and Nginx.
 
-I built the **Webhook**, **Database**, and **Nginx containers**, plus the Docker Compose integration.  
-The **Django Dashboard** UI was developed by a teammate and connects to the same database.
+This repository intentionally contains only the shareable backend and infrastructure pieces. The private dashboard/UI service is not included here.
 
----
+## Included services
 
-## 🧩 Architecture
+- `Webhook`: Flask + Gunicorn webhook that receives ANPR events, stores detections, and can send optional notifications.
+- `DB`: PostgreSQL image with the initial schema used by the project.
+- `Nginx`: Static file serving for generated image assets.
 
+## Quick start
 
-
-Camera → Flask Webhook → PostgreSQL
-↳ saves XML & images → served via Nginx
-↳ optional Email / Telegram alerts
-
-
----
-
-## 🚀 Quick Start
-
-### With Docker
 ```bash
-git clone https://github.com/<your-username>/access-control-dash.git
-cd access-control-dash
 cp .env.example .env
 docker compose up --build
+```
 
+Default local endpoints:
 
-Services
+- Webhook: `http://localhost:5000/webhookcallback`
+- Image files: `http://localhost/licenseimage/<filename>` and `http://localhost/detectionimage/<filename>`
 
-Flask Webhook → http://localhost:5000/webhookcallback
+## Security notes
 
-Images served via Nginx:
+- Real credentials, production domains, and personal contact details have been removed from this public repo.
+- Secrets must be provided through environment variables.
+- Directory browsing for generated images is disabled by default.
+- Use a non-default database password before deploying anywhere beyond local development.
 
-http://localhost/licenseimage/
+## Repository layout
 
-http://localhost/detectionimage/
+```text
+.
+|-- DB/
+|   |-- Dockerfile
+|   |-- init_schema.sql
+|   `-- postgres-custom.conf
+|-- Nginx/
+|   |-- Dockerfile
+|   `-- public-assets-nginx.conf
+|-- Webhook/
+|   |-- Dockerfile
+|   |-- anpr_webhook_app.py
+|   |-- license_plate_validator.py
+|   `-- requirements.txt
+|-- .env.example
+|-- .gitignore
+`-- docker-compose.yml
+```
 
-🧾 Example Request
+## Notes for public sharing
 
-Send test data to the webhook:
-
-curl -X POST http://localhost:5000/webhookcallback \
-  -F "anpr.xml=@test/anpr.xml" \
-  -F "platePicture.jpg=@test/plate.jpg" \
-  -F "detectionPicture.jpg=@test/detect.jpg"
-
-🗄️ Database Schema
-
-The main table for detections:
-
-CREATE TABLE public.lprdetecciones (
-  id SERIAL PRIMARY KEY,
-  ipAddress VARCHAR(255),
-  eventType VARCHAR(255),
-  licensePlate VARCHAR(50),
-  vehicleType VARCHAR(50),
-  confidenceLevel INT,
-  direction VARCHAR(50),
-  channelName VARCHAR(100),
-  licenseImage TEXT,
-  detectionImage TEXT,
-  dataTime TIMESTAMP
-);
-
-🧠 Technologies
-
-Flask (Gunicorn) – Webhook API
-
-PostgreSQL 17 – Database
-
-Nginx – Static serving
-
-Docker Compose – Multi-service orchestration
-
-Optional: yagmail + python-telegram-bot for notifications
-
-📊 Django Dashboard
-
-Frontend interface built by a teammate.
-Connects to the same PostgreSQL DB.
-Repo: access-control-dashboard
-
-🔒 Notes
-
-Never commit real .env files or credentials.
-
-Use .env.example as a safe template.
-
-Default ports: 5000 (Flask), 80 (Nginx), 5433 (Postgres).
-
-🧑‍💻 Author
-
-Ruben Conteiro
-Infrastructure & Backend Engineer
-📧 rconteiro98@gmail.com
-
-🌐 linkedin.com/in/rconteiro
-
-
----
-
-## 🪞 5. GitHub repo details
-
-### 🏷️ Tagline (for the top of your GitHub page)
-> **ANPR Access Control System — Flask + PostgreSQL + Nginx + Docker Compose. I built the backend containers and infra integration.**
-
-### 🧠 Suggested Topics
-
-
-docker
-flask
-postgresql
-nginx
-gunicorn
-docker-compose
-anpr
-iot
-smart-systems
-devops
-python
-automation
-
-
----
-
-## ✅ Folder Summary
-
-When you finish, your root directory should look like this:
-
-
-
-access-control-dash/
-├── DB/
-├── Webhook/
-├── Nginx/
-├── docker-compose.yml
-├── .env.example
-├── .gitignore
-├── LICENSE
-└── README.md
+- The dashboard service referenced in the original project is external to this repository.
+- Review `.env.example` and set only the variables you actually need.
+- If you enable email or Telegram notifications, keep those secrets only in `.env` or your deployment platform's secret store.

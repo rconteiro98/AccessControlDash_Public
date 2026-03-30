@@ -3,10 +3,10 @@ FROM postgres:17
 
 ENV PGPORT 5433
 
-# Copia tu archivo postgresql.conf al contenedor
-COPY postgresql.conf /etc/postgresql/postgresql.conf
+# Copy the PostgreSQL config into the image
+COPY postgres-custom.conf /etc/postgresql/postgresql.conf
 
-# Copy initialization scripts into the image (if needed)
-COPY initdb.sql /docker-entrypoint-initdb.d/init.sql
+# Copy the schema initialization script into the image
+COPY init_schema.sql /docker-entrypoint-initdb.d/init.sql
 
 EXPOSE 5433

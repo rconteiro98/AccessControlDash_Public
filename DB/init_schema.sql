@@ -1,4 +1,4 @@
--- Crear tabla Movil
+-- Create table Movil
 CREATE TABLE public.movil (
     nro_movil SERIAL PRIMARY KEY,
     descripcion_movil VARCHAR(100) NOT NULL,
@@ -7,20 +7,20 @@ CREATE TABLE public.movil (
     color_mov VARCHAR(100) DEFAULT 'blue' CHECK (color_mov IN ('black', 'white', 'blue', 'red', 'green', 'brown', 'grey', 'pink', 'purple', 'orange', 'yellow', 'darkolive', 'lightpink', 'lightblue'))
 );
 
--- Crear tabla UserProfile
+-- Create table UserProfile
 CREATE TABLE public.user_profile (
     id SERIAL PRIMARY KEY,
     user_id INTEGER UNIQUE REFERENCES auth_user(id) ON DELETE CASCADE,
     profile_picture VARCHAR(100)
 );
 
--- Crear tabla Conductor
+-- Create table Conductor
 CREATE TABLE public.conductor (
     id SERIAL PRIMARY KEY,
     nombre_conductor VARCHAR(100) NOT NULL
 );
 
--- Crear tabla Agendamiento
+-- Create table Agendamiento
 CREATE TABLE public.agendamiento (
     id SERIAL PRIMARY KEY,
     descripcion_agendamiento VARCHAR(100) NOT NULL,

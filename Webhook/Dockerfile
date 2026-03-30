@@ -22,4 +22,4 @@ COPY . .
 EXPOSE 5000
 
 # Define the Gunicorn entrypoint
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "demo_analiticas_2:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "anpr_webhook_app:app"]
