@@ -1,16 +1,47 @@
-# AccessControlDash
+# AccessControlDash Public
 
-Public-safe infrastructure for an access-control workflow built around an ANPR webhook, PostgreSQL, and Nginx.
+Public-safe backend and infrastructure layer for an ANPR-based access-control platform.
 
-This repository intentionally contains only the shareable backend and infrastructure pieces. The private dashboard/UI service is not included here.
+This repository shows how the platform receives camera events, processes webhook payloads, stores structured detections, persists image evidence, and serves media assets through a containerised Linux deployment. The private dashboard/UI and production-specific infrastructure are intentionally excluded.
 
-## Included services
+## Portfolio Summary
 
-- `Webhook`: Flask + Gunicorn webhook that receives ANPR events, stores detections, and can send optional notifications.
-- `DB`: PostgreSQL image with the initial schema used by the project.
-- `Nginx`: Static file serving for generated image assets.
+Designed and implemented a reusable Linux-Docker-Python backend that integrates ANPR camera webhooks, a Flask/Gunicorn service, PostgreSQL persistence, Nginx static media serving, and Docker Compose orchestration to support access-control visibility and operational vehicle review workflows.
 
-## Quick start
+## System Architecture
+
+![AccessControlDash system architecture](diagrams/system-architecture.svg)
+
+## What This Repository Demonstrates
+
+- **Solution architecture:** a multi-service backend split into webhook processing, database persistence, media serving, configuration, and persistent storage.
+- **API/data-flow integration:** camera webhooks are transformed from XML/image payloads into structured database records and reusable image assets.
+- **Deployment thinking:** services are containerised with Dockerfiles and coordinated with Docker Compose.
+- **Security-aware design:** secrets are environment-based, generated media routes disable directory browsing, and production credentials/domains are removed.
+- **Operational value:** raw ANPR events become searchable, reviewable access-control data for a separate dashboard workflow.
+
+## Included Services
+
+| Service | Technology | Responsibility |
+| --- | --- | --- |
+| `Webhook` | Python, Flask, Gunicorn | Receives ANPR callbacks, parses XML, validates image uploads, writes detections, and can send optional notifications. |
+| `DB` | PostgreSQL | Stores access-control records, vehicle-related tables, and `lprdetecciones` detection events. |
+| `Nginx` | Nginx | Serves generated license-plate and detection images from read-only Docker volumes. |
+| `docker-compose.yml` | Docker Compose | Builds and runs the backend, database, Nginx, and persistent volumes together. |
+| `.env.example` | Environment config | Documents runtime configuration without publishing real secrets. |
+
+## Data Flow
+
+1. An ANPR camera sends XML metadata and images to `POST /webhookcallback`.
+2. The Flask/Gunicorn service parses the payload, validates file types, normalises fields, and handles duplicate detection logic.
+3. Detection metadata is written into PostgreSQL.
+4. License-plate images, detection images, and XML payloads are stored in persistent Docker volumes.
+5. Nginx exposes generated image assets through static routes for downstream dashboard/review use.
+6. Optional email or Telegram alerts can be enabled through environment variables.
+
+For more detail, see [docs/data-flow.md](docs/data-flow.md).
+
+## Quick Start
 
 ```bash
 cp .env.example .env
@@ -20,16 +51,10 @@ docker compose up --build
 Default local endpoints:
 
 - Webhook: `http://localhost:5000/webhookcallback`
-- Image files: `http://localhost/licenseimage/<filename>` and `http://localhost/detectionimage/<filename>`
+- License image files: `http://localhost/licenseimage/<filename>`
+- Detection image files: `http://localhost/detectionimage/<filename>`
 
-## Security notes
-
-- Real credentials, production domains, and personal contact details have been removed from this public repo.
-- Secrets must be provided through environment variables.
-- Directory browsing for generated images is disabled by default.
-- Use a non-default database password before deploying anywhere beyond local development.
-
-## Repository layout
+## Repository Layout
 
 ```text
 .
@@ -45,13 +70,42 @@ Default local endpoints:
 |   |-- anpr_webhook_app.py
 |   |-- license_plate_validator.py
 |   `-- requirements.txt
+|-- diagrams/
+|   `-- system-architecture.svg
+|-- docs/
+|   `-- data-flow.md
 |-- .env.example
 |-- .gitignore
 `-- docker-compose.yml
 ```
 
-## Notes for public sharing
+## Public-Safe Scope
 
-- The dashboard service referenced in the original project is external to this repository.
-- Review `.env.example` and set only the variables you actually need.
-- If you enable email or Telegram notifications, keep those secrets only in `.env` or your deployment platform's secret store.
+Included:
+
+- backend service code
+- PostgreSQL schema
+- Nginx media-serving configuration
+- Docker Compose infrastructure
+- public-safe environment template
+- architecture and data-flow documentation
+
+Excluded:
+
+- private dashboard/UI service
+- production domains and infrastructure details
+- real credentials, tokens, chat IDs, and email passwords
+- client-specific private deployment information
+
+## Security Notes
+
+- Replace all default passwords before any non-local deployment.
+- Keep secrets in `.env` or a deployment secret store, not in Git.
+- Use HTTPS and source restrictions for production webhook endpoints.
+- Configure `WEBHOOK_SECRET` for HMAC signature validation where possible.
+- Keep generated image directories private unless the surrounding deployment controls access.
+- Rotate credentials and notification tokens after demos or environment changes.
+
+## Why It Matters
+
+This project is a portfolio example of production-style solution engineering: it connects an external event source, backend processing, persistent storage, static media delivery, configuration management, and operational review needs into one deployable architecture.

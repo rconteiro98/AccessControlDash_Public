@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">AccessControlDash system architecture</title>
+  <desc id="desc">Block diagram showing ANPR cameras sending webhooks to a Flask and Gunicorn service, PostgreSQL storing detections, Nginx serving generated image assets, Docker Compose orchestrating services, and environment variables supplying configuration.</desc>
+  <defs>
+    <style>
+      .bg { fill: #0f172a; }
+      .panel { fill: #111827; stroke: #334155; stroke-width: 2; }
+      .card { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+      .card-dark { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .card-green { fill: #dcfce7; stroke: #16a34a; stroke-width: 2; }
+      .card-orange { fill: #ffedd5; stroke: #ea580c; stroke-width: 2; }
+      .card-purple { fill: #ede9fe; stroke: #7c3aed; stroke-width: 2; }
+      .card-yellow { fill: #fef9c3; stroke: #ca8a04; stroke-width: 2; }
+      .label { fill: #0f172a; font-family: Arial, Helvetica, sans-serif; font-size: 22px; font-weight: 700; }
+      .small { fill: #334155; font-family: Arial, Helvetica, sans-serif; font-size: 16px; }
+      .tiny { fill: #475569; font-family: Arial, Helvetica, sans-serif; font-size: 14px; }
+      .white { fill: #f8fafc; font-family: Arial, Helvetica, sans-serif; font-size: 26px; font-weight: 700; }
+      .subwhite { fill: #cbd5e1; font-family: Arial, Helvetica, sans-serif; font-size: 16px; }
+      .arrow { stroke: #38bdf8; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .arrow-green { stroke: #22c55e; stroke-width: 4; fill: none; marker-end: url(#arrow-green); }
+      .arrow-orange { stroke: #f97316; stroke-width: 4; fill: none; marker-end: url(#arrow-orange); }
+      .arrow-purple { stroke: #8b5cf6; stroke-width: 4; fill: none; marker-end: url(#arrow-purple); }
+      .dash { stroke-dasharray: 8 8; }
+      .icon { stroke: #0f172a; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .icon-fill { fill: #0f172a; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#22c55e"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#f97316"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#8b5cf6"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1280" height="760" rx="0"/>
+  <text class="white" x="60" y="58">AccessControlDash - Public Backend Architecture</text>
+  <text class="subwhite" x="60" y="88">Containerised ANPR event ingestion, PostgreSQL persistence, and Nginx media serving</text>
+
+  <rect class="panel" x="42" y="118" width="1196" height="570" rx="22"/>
+  <text class="subwhite" x="72" y="152">Docker Compose network</text>
+
+  <!-- External camera source -->
+  <rect class="card-yellow" x="78" y="250" width="190" height="155" rx="18"/>
+  <rect class="icon" x="112" y="290" width="68" height="46" rx="8"/>
+  <circle class="icon" cx="146" cy="313" r="13"/>
+  <path class="icon" d="M180 302 L220 282 L220 346 L180 326"/>
+  <text class="label" x="112" y="372">ANPR camera</text>
+  <text class="small" x="112" y="396">XML + images</text>
+
+  <!-- Webhook service -->
+  <rect class="card-dark" x="360" y="212" width="260" height="230" rx="20"/>
+  <path class="icon" d="M423 272 h82 a30 30 0 0 1 0 60 h-82 a30 30 0 0 1 0-60"/>
+  <path class="icon" d="M440 302 h46"/>
+  <path class="icon" d="M478 288 l18 14 l-18 14"/>
+  <text class="label" x="400" y="370">Flask webhook</text>
+  <text class="small" x="400" y="397">Gunicorn app server</text>
+  <text class="tiny" x="400" y="424">/webhookcallback</text>
+
+  <!-- DB service -->
+  <rect class="card-green" x="750" y="184" width="230" height="170" rx="20"/>
+  <ellipse class="icon" cx="815" cy="241" rx="40" ry="15"/>
+  <path class="icon" d="M775 241 v58 c0 9 18 16 40 16 s40-7 40-16 v-58"/>
+  <path class="icon" d="M775 270 c0 9 18 16 40 16 s40-7 40-16"/>
+  <text class="label" x="882" y="246">PostgreSQL</text>
+  <text class="small" x="882" y="274">detections</text>
+  <text class="tiny" x="882" y="300">lprdetecciones</text>
+
+  <!-- Nginx service -->
+  <rect class="card-orange" x="750" y="414" width="230" height="170" rx="20"/>
+  <path class="icon" d="M796 468 l38-22 l38 22 v44 l-38 22 l-38-22 z"/>
+  <path class="icon" d="M814 478 h40 M814 500 h40"/>
+  <text class="label" x="882" y="474">Nginx</text>
+  <text class="small" x="882" y="502">static media</text>
+  <text class="tiny" x="882" y="528">read-only images</text>
+
+  <!-- Volumes -->
+  <rect class="card-purple" x="1042" y="292" width="150" height="210" rx="18"/>
+  <path class="icon" d="M1088 338 h58 v92 h-58 z"/>
+  <path class="icon" d="M1100 356 h34 M1100 378 h34 M1100 400 h34"/>
+  <text class="label" x="1073" y="464">Volumes</text>
+  <text class="tiny" x="1072" y="490">license images</text>
+  <text class="tiny" x="1072" y="512">detection images</text>
+  <text class="tiny" x="1072" y="534">XML payloads</text>
+
+  <!-- Env config -->
+  <rect class="card" x="360" y="520" width="260" height="105" rx="18"/>
+  <path class="icon" d="M416 554 h110 M416 578 h86 M416 602 h122"/>
+  <circle class="icon-fill" cx="400" cy="554" r="4"/>
+  <circle class="icon-fill" cx="400" cy="578" r="4"/>
+  <circle class="icon-fill" cx="400" cy="602" r="4"/>
+  <text class="label" x="548" y="572">.env</text>
+  <text class="small" x="548" y="600">configuration</text>
+
+  <!-- Optional notifications -->
+  <rect class="card" x="78" y="490" width="190" height="120" rx="18"/>
+  <path class="icon" d="M120 536 h80 v52 h-80 z"/>
+  <path class="icon" d="M120 536 l40 32 l40-32"/>
+  <text class="label" x="112" y="635">Notifications</text>
+  <text class="small" x="112" y="660">email / Telegram</text>
+
+  <!-- Client/operator -->
+  <rect class="card" x="1042" y="120" width="150" height="115" rx="18"/>
+  <path class="icon" d="M1084 154 h66 v42 h-66 z M1098 210 h38 M1117 196 v14"/>
+  <text class="label" x="1076" y="256">Dashboard</text>
+  <text class="tiny" x="1068" y="278">private UI excluded</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M268 328 H352"/>
+  <text class="subwhite" x="286" y="312">POST</text>
+  <path class="arrow-green" d="M620 290 H742"/>
+  <text class="subwhite" x="646" y="274">insert/query</text>
+  <path class="arrow-orange" d="M620 382 C680 410 690 484 742 500"/>
+  <text class="subwhite" x="646" y="453">image files</text>
+  <path class="arrow-purple" d="M980 500 H1034"/>
+  <path class="arrow-purple" d="M980 270 C1030 270 1034 330 1042 360"/>
+  <path class="arrow dash" d="M620 572 H742 C812 572 878 600 1042 440"/>
+  <path class="arrow dash" d="M360 570 H270"/>
+  <path class="arrow dash" d="M1042 190 H988"/>
+
+  <!-- Legend -->
+  <rect class="panel" x="72" y="706" width="1136" height="34" rx="12"/>
+  <circle cx="96" cy="723" r="6" fill="#38bdf8"/>
+  <text class="subwhite" x="110" y="729">request/data flow</text>
+  <circle cx="278" cy="723" r="6" fill="#22c55e"/>
+  <text class="subwhite" x="292" y="729">database persistence</text>
+  <circle cx="508" cy="723" r="6" fill="#f97316"/>
+  <text class="subwhite" x="522" y="729">media serving</text>
+  <circle cx="700" cy="723" r="6" fill="#8b5cf6"/>
+  <text class="subwhite" x="714" y="729">persistent volumes/configuration</text>
+</svg>
